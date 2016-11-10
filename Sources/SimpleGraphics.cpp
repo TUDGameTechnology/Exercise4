@@ -24,6 +24,9 @@ namespace {
 }
 
 void startFrame() {
+	Graphics::begin();
+	Graphics::clear(Graphics::ClearColorFlag, 0xff000000);
+
 	image = (int*)texture->lock();
 }
 
@@ -238,10 +241,6 @@ void drawTriangle(float x1, float y1, float z1, float u1, float v1, float x2, fl
 
 void endFrame() {
 	texture->unlock();
-
-	Graphics::begin();
-	Graphics::clear(Graphics::ClearColorFlag, 0xff000000);
-
 
 	program->set();
 	Graphics::setTexture(tex, texture);
