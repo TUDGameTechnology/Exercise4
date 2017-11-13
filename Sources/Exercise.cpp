@@ -19,8 +19,13 @@ using namespace Kore;
 namespace {
 	double startTime;
 	Mesh* mesh;
-	//Image* image;
-
+	
+	// Add more simple variables if you like to
+	// but put bigger things in memory.
+	// Avoid any "new".
+	int imageWidth;
+	int imageHeight;
+	
 	void update() {
 		float t = (float)(System::time() - startTime);
 		Kore::Audio2::update();
@@ -54,9 +59,9 @@ namespace {
 
 			// Draw the triangle
 			float drawScale = 128;
-			drawTriangle(x1 * drawScale + width / 2, y1 * drawScale + height / 2,
-						 x2 * drawScale + width / 2, y2 * drawScale + height / 2,
-						 x3 * drawScale + width / 2, y3 * drawScale + height / 2);
+			drawTriangle(x1 * drawScale + width / 2, y1 * drawScale + height / 2, z1, u1, v1,
+						 x2 * drawScale + width / 2, y2 * drawScale + height / 2, z2, u2, v2,
+						 x3 * drawScale + width / 2, y3 * drawScale + height / 2, z3, u3, v3);
 		}
 
 		Graphics1::end();
@@ -95,7 +100,7 @@ void shadePixel(int x, int y, float z, float u, float v) {
 	// Implement z-buffering
 	// Use getPixel to read image data, which is returned in the reference parameters.
 	// The texture is provided in the Image "image" (tiger-atlas.jpg in the Deployment-folder)
-	//setPixel(x, y, 1.0f, 0.0f, 0.0f);
+	Graphics1::setPixel(x, y, 1.0f, 0.0f, 0.0f);
 }
 
 int kore(int argc, char** argv) {
@@ -111,6 +116,7 @@ int kore(int argc, char** argv) {
 	
 	Memory::init();
 	mesh = loadObj("tiger.obj");
+	loadImage("tiger-atlas.jpg", &imageWidth, &imageHeight);
 	
 	Keyboard::the()->KeyDown = keyDown;
 	Keyboard::the()->KeyUp = keyUp;
