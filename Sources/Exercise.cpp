@@ -5,25 +5,29 @@
 #include <Kore/System.h>
 #include <Kore/Input/Keyboard.h>
 #include <Kore/Input/Mouse.h>
-#include <Kore/Audio/Mixer.h>
-#include <Kore/Graphics/Image.h>
-#include "SimpleGraphics.h"
+#include <Kore/Audio1/Audio.h>
+#include <Kore/Graphics1/Graphics.h>
+#include "GraphicsHelper.h"
+#include "Memory.h"
 #include "ObjLoader.h"
+
+const int width = 512;
+const int height = 512;
 
 using namespace Kore;
 
 namespace {
 	double startTime;
 	Mesh* mesh;
-	Image* image;
+	//Image* image;
 
 	void update() {
 		float t = (float)(System::time() - startTime);
-		Kore::Audio::update();
+		Kore::Audio2::update();
 		
-		startFrame();
-
+		Graphics1::begin();
 		clear(0, 0, 0);
+		
 		// Add some nice transformations
 		for (int i = 0; i < mesh->numFaces; ++i) {
 			int i1 = mesh->indices[i * 3 + 0];
@@ -48,25 +52,24 @@ namespace {
 			float u3 = mesh->vertices[i3 * 5 + 3];
 			float v3 = mesh->vertices[i3 * 5 + 4];
 
-			float scale = 100.0f;
-
-			drawTriangle(
-				x1 * scale + width * 0.5f, y1 * scale + height * 0.5f, z1, u1, v1,
-				x2 * scale + width * 0.5f, y2 * scale + height * 0.5f, z2, u2, v2,
-				x3 * scale + width * 0.5f, y3 * scale + height * 0.5f, z3, u3, v3);
+			// Draw the triangle
+			float drawScale = 128;
+			drawTriangle(x1 * drawScale + width / 2, y1 * drawScale + height / 2,
+						 x2 * drawScale + width / 2, y2 * drawScale + height / 2,
+						 x3 * drawScale + width / 2, y3 * drawScale + height / 2);
 		}
 
-		endFrame();
+		Graphics1::end();
 	}
 
-	void keyDown(KeyCode code, wchar_t character) {
-		if (code == Key_Left) {
+	void keyDown(KeyCode code) {
+		if (code == KeyLeft) {
 			// ...
 		}
 	}
 
-	void keyUp(KeyCode code, wchar_t character) {
-		if (code == Key_Left) {
+	void keyUp(KeyCode code) {
+		if (code == KeyLeft) {
 			// ...
 		}
 	}
@@ -92,23 +95,23 @@ void shadePixel(int x, int y, float z, float u, float v) {
 	// Implement z-buffering
 	// Use getPixel to read image data, which is returned in the reference parameters.
 	// The texture is provided in the Image "image" (tiger-atlas.jpg in the Deployment-folder)
-	setPixel(x, y, 1.0f, 0.0f, 0.0f);
+	//setPixel(x, y, 1.0f, 0.0f, 0.0f);
 }
 
 int kore(int argc, char** argv) {
-	Kore::System::init("Exercise 4", width, height);
+	System::init("Exercise 4", width, height);
 	
-	initGraphics();
+	Graphics1::init(width, height);
 	Kore::System::setCallback(update);
 
 	startTime = System::time();
-	Kore::Mixer::init();
-	Kore::Audio::init();
-	//Kore::Mixer::play(new SoundStream("back.ogg", true));
-
+	
+	Kore::Audio2::init();
+	Kore::Audio1::init();
+	
+	Memory::init();
 	mesh = loadObj("tiger.obj");
-	image = new Image("tiger-atlas.jpg", true);
-
+	
 	Keyboard::the()->KeyDown = keyDown;
 	Keyboard::the()->KeyUp = keyUp;
 	Mouse::the()->Move = mouseMove;
