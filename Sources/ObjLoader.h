@@ -4,11 +4,11 @@ struct Mesh {
 	int numFaces;
 	int numVertices;
 	int numUVs;
-
+	
 	float* vertices;
 	int* indices;
 	float* uvs;
-
+	
 	// very private
 	float* curVertex;
 	int* curIndex;
