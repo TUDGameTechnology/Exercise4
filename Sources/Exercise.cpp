@@ -23,6 +23,7 @@ namespace {
 	// Add more simple variables if you like to
 	// but put bigger things in memory.
 	// Avoid any "new".
+	u8* image;
 	int imageWidth;
 	int imageHeight;
 	
@@ -116,7 +117,7 @@ int kore(int argc, char** argv) {
 	
 	Memory::init();
 	mesh = loadObj("tiger.obj");
-	loadImage("tiger-atlas.jpg", &imageWidth, &imageHeight);
+	image = loadImage("tiger-atlas.jpg", &imageWidth, &imageHeight);
 	
 	Keyboard::the()->KeyDown = keyDown;
 	Keyboard::the()->KeyUp = keyUp;

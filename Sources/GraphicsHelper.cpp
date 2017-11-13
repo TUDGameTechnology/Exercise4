@@ -21,24 +21,23 @@ void clear(float red, float green, float blue) {
 	}
 }
 
-void* loadImage(const char* filename, int* imageWidth, int* imageHeight) {
+Kore::u8* loadImage(const char* filename, int* imageWidth, int* imageHeight) {
 	Graphics1::Image image(filename, true);
 	*imageWidth = image.width;
 	*imageHeight = image.height;
-	void* memory = Memory::allocate(image.width * image.height * 4);
+	Kore::u8* memory = Memory::allocate<Kore::u8>(image.width * image.height * 4);
 	memcpy(memory, image.data, image.dataSize);
 	return memory;
 }
 
-int readPixel(Kore::u8* image, int imageWidth, int imageHeight, int x, int y) {
-	int c = *(int*)&(image)[imageWidth * 4 * y + x * 4];
-	int a = (c >> 24) & 0xff;
-
-	int b = (c >> 16) & 0xff;
-	int g = (c >> 8) & 0xff;
-	int r = c & 0xff;
-
-	return a << 24 | r << 16 | g << 8 | b;
+void readPixel(Kore::u8* image, int imageWidth, int imageHeight, int x, int y, float& red, float& green, float& blue) {
+	if (x < 0 || x > imageWidth || y < 0 || y > imageHeight) {
+		return;
+	}
+	int col = *(int*)&(image)[imageWidth * 4 * y + x * 4];
+	blue = ((col & 0xff0000) >> 16) / 255.0f;
+	green = ((col & 0xff00) >> 8) / 255.0f;
+	red = (col & 0xff) / 255.0f;
 }
 
 void drawImage(Kore::u8* image, int imageWidth, int imageHeight, int x, int y) {
@@ -48,12 +47,8 @@ void drawImage(Kore::u8* image, int imageWidth, int imageHeight, int x, int y) {
 	int w = min(imageWidth, Graphics1::width() - x);
 	for (int yy = ystart; yy < h; ++yy) {
 		for (int xx = xstart; xx < w; ++xx) {
-			int col = readPixel(image, imageWidth, imageHeight, xx, yy);
-
-			float a = ((col >> 24) & 0xff) / 255.0f;
-			float r = ((col >> 16) & 0xff) / 255.0f;
-			float g = ((col >> 8) & 0xff) / 255.0f;
-			float b = (col & 0xff) / 255.0f;
+			float r, g, b;
+			readPixel(image, imageWidth, imageHeight, xx, yy, r, g, b);
 			Graphics1::setPixel(x + xx, y + yy, r, g, b);
 		}
 	}
